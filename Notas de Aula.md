@@ -86,3 +86,137 @@ Se utilizarmos a flag **-a**, ele mostra todos os containers que já foram execu
     ``` docker
         docker rm 8528847e4507 -f
     ```
+
+## Criar uma imagem
+
+* Para definir uma imagem, criamos um Dockerfile. Exemplo: 
+
+    ``` docker
+        FROM node
+
+        WORKDIR /app
+
+        # Copiando o package e o package-lock (por isso o asterisco) para a workdir (indicada pelo ponto, que poderia ser substituído por '/app')
+        COPY package*.json .
+
+        RUN npm install
+
+        # "Copia tudo (primeiro ponto) para o meu container (segundo ponto)"
+        COPY . .
+
+        # Porta do container a ser exposta
+        EXPOSE 3000
+
+        CMD ["node", "app.js"]
+    ```    
+* Para criar uma imagem, na pasta onde o Dockerfile estiver definido:
+    ```powershell
+        docker build .
+    ```
+    ou
+
+    ```powershell
+        docker build <-caminho-diretorio>
+    ```
+
+## Alterar uma imagem
+
+* Sempre que uma alteração for feita, é preciso fazer o build novamente.
+
+* Para o Docker, é como se fosse uma imagem completamente nova.
+
+* Normalmente será bem rápido. Como as layers estão salvas em cache, uma modificação nos arquivos de um projeto representaria apenas uma mudança a partir da layer de _COPY_ do exemplo de Dockerfile acima.
+
+## Camadas das Imagens
+
+* AS imagens do Docker são divididas em camadas;
+
+* Cada instrução no Dockerfile representa uma layer. As layers são salvas em cache para uma atualização mais rápida (em novos builds).
+
+## Download de Imagens
+
+* É possível fazer o download de uma imagem do Docker Hub e deixá-la disponível no ambiente de desenvolvimento:
+
+    ```docker
+        docker pull <imagem>
+    ```
+
+    Exemplo:
+
+    ```docker
+        docker run python
+    ```
+
+## Ajuda com os Comandos
+
+* Para ter ajuda sobre qualquer comando Docker, basta inserir a flag _**--help**_ após inserir qualquer parte do comando. Exemplos:
+
+    ``` docker
+        docker --help
+    ```
+    
+    ``` docker
+        docker run --help
+    ```
+
+## Modificando a Tag de uma Imagem
+
+* É possível criar tags personalizadas para uma imagem:
+
+    ```docker 
+        docker tag <id-imagem> <nome-imagem>:<tag>
+    ```
+## Nomeando e Criando tag no build
+
+* Para simplificar o processo de nomear uma imagem e criar uma tag para ela, é possível fazer isso no build de uma imagem:
+
+    ``` docker 
+        docker build -t <nome_imagem>:<tag_imagem> .
+    ```
+## Reiniciando Container com Iteratividade
+
+* Não é necessário rodar um" _docker run ..._" para trocar o container de detached para iteractive. Basta executar o comando docker start para um container já existente, passando a flag _-i_:
+
+    ```docker
+        docker start -i <nome-container>
+    ```
+
+## Remover Imagens
+* Para remover uma imagem da máquina, é utilizado o comando **_docker rmi [<id_da_imagem>]_**:
+
+    ``` docker
+        docker rm 8528847e4507
+    ```
+
+* Se a imagem estiver sendo utilizada por um container, pode ser usada a flag **_-f_** (force):
+
+    ``` docker
+        docker rmi -f 8528847e4507
+    ```
+
+## Limpando o Sistema
+
+* Para remover imagens, containers e networks não utilizadas:
+
+```docker 
+    docker system prune
+```
+## Remover um container após a sua utilização
+
+* Para remover um container no momento que ele for parado, basta que ele seja criado utilizando a flag _**--rm**_ da seguinte forma:
+
+``` docker 
+    docker run --rm <container>
+```
+## Copiar arquivos de um container
+
+* Um comando útil para copiar arquivos de um container para a máquina (e vice versa) é o _**cp**_:
+
+    ``` docker
+        docker cp <nome-container>:<caminho-relativo-container> <caminho-relativo-maquina> 
+    ``` 
+    Exemplo:
+
+    ``` docker
+        docker cp meucontainer:/app.app.js ./copiafolder
+    ``` 
